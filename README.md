@@ -1,7 +1,7 @@
 
-#Getting And Cleaning Data Final Project
+# Getting And Cleaning Data Final Project
 
-# download the data
+## Download the data
 
 library(data.table)
 fileURL = 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
@@ -11,7 +11,7 @@ if (!file.exists('./UCI HAR Dataset.zip')){
   unzip("UCI HAR Dataset.zip", exdir = getwd())
 }
 
-# read and convert the data
+## Read and convert the data
 
 features <- read.csv('./UCI HAR Dataset/features.txt', header = FALSE, sep = ' ')
 features <- as.character(features[,2])
@@ -31,21 +31,21 @@ test_data <-  data.frame(subject_test, y_test, x_test)
 names(test_data) <- c(c('subject', 'activity'), features)
 
 
-# merge the training and test data into one data set
+## Merge the training and test data into one data set
 data <- rbind(train_data, test_data)
 
-# extract the mean and standard deviation 
+## Extract the mean and standard deviation 
 
 features_avg_std <- grep('mean|std', features)
 data_avg_std <- data[,c(1,2,features_avg_std + 2)]
 
-# read activity labels to provide descriptive names for each activity
+## Read activity labels to provide descriptive names for each activity
 
 activity_labels <- read.table('./UCI HAR Dataset/activity_labels.txt', header = FALSE)
 activity_labels <- as.character(activity_labels[,2])
 data_avg_std$activity <- activity_labels[data_avg_std$activity]
 
-# assign descriptive names to all variables
+## Assign descriptive names to all variables
 
 new_names <- names(data_avg_std)
 new_names <- gsub("[(][)]", "", new_names)
@@ -59,9 +59,8 @@ new_names <- gsub("-std-", "_StandardDeviation_", new_names)
 new_names <- gsub("-", "_", new_names)
 names(data_avg_std) <- new_names 
 
-# create tidy data set with the average of each variable for each activity and each subject.
+## Create tidy data set with the average of each variable for each activity and each subject.
 
 tidy_data <- aggregate(data_avg_std[,3:81], by = list(activity = data_avg_std$activity, subject = data_avg_std$subject),FUN = mean)
 
 write.table(x = tidy_data, file = "tidy_data.txt", row.names = FALSE)
-
